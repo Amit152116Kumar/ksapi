@@ -356,7 +356,7 @@ class KSTradeApi():
         return new_array
 
 
-    def subscribe(self, input_tokens, callback,connect_event, disconnect_event, broadcast_host=broadcast_host):
+    def subscribe(self, input_tokens, callback,connect_event, error_event, disconnect_event, broadcast_host=broadcast_host):
         try:
             if self.consumer_secret == None or not self.consumer_secret:
                 raise ApiValueError("Please provide the consumer_secret paramater while creating KSTradeApi object or supply in settings file.")
@@ -389,7 +389,7 @@ class KSTradeApi():
                 parsed_broadcast_host = urllib.parse.urlparse(broadcast_host)
                 socketio_path = parsed_broadcast_host.path
                 
-                date_now = datetime.date.today().strftime("%d%m%y")
+                date_now = datetime.datetime.now(tz=IST).strftime("%Y-%m-%d")
                 # Set up a logging handler that writes logs to a file
                 logging_handler = logging.FileHandler(f'logs/socketio_{date_now}.log')
                 logging_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
@@ -410,8 +410,8 @@ class KSTradeApi():
                 # Redirect stderr to the logging handler too, so that all error messages are logged
                 sys.stderr = logging_handler.stream
                 self.sio = socketio.Client(
-                    reconnection=True, request_timeout=30, reconnection_attempts=5, engineio_logger=True,
-                            logger=True,http_session=session, ssl_verify=session.verify)
+                    reconnection=True, request_timeout=25, reconnection_attempts=5, engineio_logger=True,
+                    reconnection_delay_max=60, logger=True,http_session=session, ssl_verify=session.verify)
 
                 @self.sio.event
                 def connect():
@@ -420,7 +420,7 @@ class KSTradeApi():
 
                 @self.sio.event
                 def connect_error(data):
-                    disconnect_event()
+                    error_event()
 
                 @self.sio.event
                 def disconnect():
