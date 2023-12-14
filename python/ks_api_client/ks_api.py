@@ -9,6 +9,7 @@ import requests
 import logging
 import sys
 import datetime
+import pytz
 from ks_api_client.exceptions import ApiException, ApiValueError
 from ks_api_client.models import NewMTFOrder, NewNormalOrder, NewOrder, \
                 NewSMOrder, NewSOROrder, ExistingMTFOrder, ExistingNormalOrder, \
@@ -388,7 +389,7 @@ class KSTradeApi():
             if 'result' in jsonResponse and 'token' in jsonResponse['result'] and jsonResponse['result']['token']:
                 parsed_broadcast_host = urllib.parse.urlparse(broadcast_host)
                 socketio_path = parsed_broadcast_host.path
-                
+                IST = pytz.timezone("Asia/Kolkata")
                 date_now = datetime.datetime.now(tz=IST).strftime("%Y-%m-%d")
                 # Set up a logging handler that writes logs to a file
                 logging_handler = logging.FileHandler(f'logs/socketio_{date_now}.log')
