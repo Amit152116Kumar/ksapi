@@ -411,7 +411,7 @@ class KSTradeApi():
                 # Redirect stderr to the logging handler too, so that all error messages are logged
                 sys.stderr = logging_handler.stream
                 self.sio = socketio.Client(
-                    reconnection=True, request_timeout=25, reconnection_attempts=5, engineio_logger=True,
+                    reconnection=True, request_timeout=30, reconnection_attempts=5, engineio_logger=True,
                     reconnection_delay_max=60, logger=True,http_session=session, ssl_verify=session.verify)
 
                 @self.sio.event
